@@ -1,15 +1,386 @@
 <!DOCTYPE html>
-<html>
+<html lang="he" dir="rtl">
 <head>
-  <title>My First Server</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="שרת Node.js מודרני">
+  <title>My Server | דף הבית</title>
+
   <style>
-    body { font-family: sans-serif; max-width: 600px; margin: 50px auto; }
-    h1 { color: #333; }
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4338ca;
+      --text: #172033;
+      --muted: #64748b;
+      --background: #f8fafc;
+      --white: #ffffff;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      background: var(--background);
+      line-height: 1.6;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+    }
+
+    .navbar {
+      max-width: 1120px;
+      margin: auto;
+      min-height: 72px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .logo {
+      color: var(--primary);
+      font-size: 1.35rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .hero {
+      max-width: 1120px;
+      min-height: 620px;
+      margin: auto;
+      padding: 90px 24px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      align-items: center;
+      gap: 70px;
+    }
+
+    .badge {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 8px 14px;
+      color: var(--primary-dark);
+      background: #eef2ff;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin-bottom: 22px;
+      font-size: clamp(2.5rem, 6vw, 4.8rem);
+      line-height: 1.1;
+      letter-spacing: -2px;
+    }
+
+    h1 span {
+      color: var(--primary);
+    }
+
+    .hero p {
+      max-width: 560px;
+      margin-bottom: 32px;
+      color: var(--muted);
+      font-size: 1.15rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 14px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    .button-primary {
+      color: white;
+      background: var(--primary);
+      box-shadow: 0 10px 22px rgba(99, 102, 241, 0.25);
+    }
+
+    .button-secondary {
+      color: var(--text);
+      background: white;
+      border: 1px solid var(--border);
+    }
+
+    .visual {
+      padding: 18px;
+      background: linear-gradient(145deg, #6366f1, #8b5cf6);
+      border-radius: 28px;
+      box-shadow: 0 25px 60px rgba(79, 70, 229, 0.25);
+      transform: rotate(2deg);
+    }
+
+    .code-window {
+      overflow: hidden;
+      background: #111827;
+      border-radius: 18px;
+      direction: ltr;
+      text-align: left;
+    }
+
+    .window-bar {
+      padding: 14px 18px;
+      background: #1f2937;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 11px;
+      height: 11px;
+      margin-right: 6px;
+      border-radius: 50%;
+      background: #ef4444;
+    }
+
+    .dot:nth-child(2) {
+      background: #f59e0b;
+    }
+
+    .dot:nth-child(3) {
+      background: #22c55e;
+    }
+
+    pre {
+      min-height: 260px;
+      padding: 28px;
+      color: #d1d5db;
+      font-family: Consolas, monospace;
+      line-height: 1.8;
+      white-space: pre-wrap;
+    }
+
+    .section {
+      max-width: 1120px;
+      margin: auto;
+      padding: 90px 24px;
+      text-align: center;
+    }
+
+    .section h2 {
+      margin-bottom: 14px;
+      font-size: 2.3rem;
+    }
+
+    .section-intro {
+      max-width: 600px;
+      margin: 0 auto 40px;
+      color: var(--muted);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+      text-align: right;
+    }
+
+    .card {
+      padding: 28px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .card-icon {
+      margin-bottom: 16px;
+      font-size: 2rem;
+    }
+
+    .card h3 {
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: var(--muted);
+    }
+
+    .contact {
+      margin-top: 30px;
+      padding: 45px 24px;
+      color: white;
+      background: linear-gradient(135deg, #4338ca, #7c3aed);
+      border-radius: 24px;
+    }
+
+    .contact p {
+      margin: 12px auto 24px;
+      color: #e0e7ff;
+    }
+
+    footer {
+      padding: 28px 24px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    @media (max-width: 760px) {
+      .navbar {
+        min-height: 64px;
+      }
+
+      .nav-links {
+        gap: 14px;
+        font-size: 0.9rem;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 60px;
+        gap: 45px;
+      }
+
+      .visual {
+        transform: none;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
+
 <body>
-  <h1>Welcome to My Server</h1>
-  <p>This page is being served by Node.js and Express.</p>
-  <p>I built this myself.</p>
+  <header>
+    <nav class="navbar" aria-label="ניווט ראשי">
+      <a class="logo" href="/">My Server</a>
+
+      <ul class="nav-links">
+        <li><a href="/">בית</a></li>
+        <li><a href="#about">אודות</a></li>
+        <li><a href="#contact">צור קשר</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <span class="badge">Node.js · Express · Web</span>
+        <h1>בונים את העתיד<br><span>שורה אחרי שורה</span></h1>
+        <p>
+          ברוכים הבאים לשרת שלי — אתר מודרני, מהיר ונקי שנבנה
+          באמצעות Node.js ו־Express.
+        </p>
+
+        <div class="actions">
+          <a class="button button-primary" href="#about">גלו עוד</a>
+          <a class="button button-secondary" href="#contact">צרו קשר</a>
+        </div>
+      </div>
+
+      <div class="visual" aria-label="דוגמת קוד">
+        <div class="code-window">
+          <div class="window-bar">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+
+          <pre><code>const server = express();
+
+server.get('/', (req, res) => {
+  res.send('Hello, World!');
+});
+
+server.listen(3000);</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <h2>מה יש באתר?</h2>
+      <p class="section-intro">
+        תשתית פשוטה וגמيشה שאפשר להרחיב לכל רעיון או פרויקט.
+      </p>
+
+      <div class="cards">
+        <article class="card">
+          <div class="card-icon">⚡</div>
+          <h3>מהיר ויעיל</h3>
+          <p>שרת קל ומהיר שמספק חוויית משתמש חלקה.</p>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">🛠️</div>
+          <h3>קל להתאמה</h3>
+          <p>מבנה פשוט שמאפשר להוסיף עמודים ופיצ׳רים בקלות.</p>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">🔒</div>
+          <h3>מוכן לצמיחה</h3>
+          <p>בסיס מצוין לבניית אפליקציות ו־API מתקדמים.</p>
+        </article>
+      </div>
+
+      <div class="contact" id="contact">
+        <h2>רוצים ליצור קשר?</h2>
+        <p>נשמח לשמוע מכם ולענות על כל שאלה.</p>
+        <a class="button button-secondary" href="mailto:hello@example.com">
+          שלחו הודעה
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 My Server · נבנה באמצעות Node.js ו־Express
+  </footer>
 </body>
 </html>
